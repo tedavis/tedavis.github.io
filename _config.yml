@@ -1,0 +1,4 @@
+name: TEDavis
+markdown: redcarpet
+pygments: false
+baseurl: /
