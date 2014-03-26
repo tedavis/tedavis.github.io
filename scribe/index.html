@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scribe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2, user-scalable=1" />
+    <meta property="og:image" content="http://designedbythomas.co.uk/sites/all/themes/simple/images/social-image.png">
+    <meta property="og:description" content="Scribe is a super simple way to jot down some text inside your browser. ">
+    <meta name="description" content="Scribe is a super simple way to jot down some text inside your browser. The text is saved using HTML5 localStorage">
+    <style>   
+        html, body{
+            height: 100%;
+            min-height: 100%;
+            z-index: 0;
+            font-size: 20px;
+            font-family: Georgia, serif;
+            padding: 0;
+            margin: 0;
+        }
+        
+        #page{
+            margin: 40px auto 0px auto;
+            padding: 10px;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+        a{
+            border-radius: 5px;
+            margin: 50px 0px;
+            padding: 10px 20px;
+            display: inline-block;
+            background-color: #519548;
+            color: #FFF;
+            text-decoration: none;
+        }
+        .clear{
+            background-color: #D95B43;
+        }
+        
+        .saving{
+            color: #f3f3f3;
+        }
+        
+        #save-notification{
+            display: inline-block;
+            color: #c5c5c5;
+            margin-left: 20px;
+        }
+        
+    </style>
+    
+    <script type="text/javascript">
+        /**
+         * Created by Thomas Davis
+         * http://designedbythomas.co.uk
+         * http://twitter.com/TEDavis
+         *
+         * So you'd like to know how it all works then? That's cool, it's a great
+         * way to learn! I've left the code below in a nice
+         * readable format for you.
+         *
+         * All I would say is that if you do use this code elsewhere
+         * please include a link back to http://designedbythomas.co.uk
+         *
+         * 
+         **/
+        
+        //
+        function supports_html5_storage() {
+            try {
+                return 'localStorage' in window && window['localStorage'] !== null;
+            } catch (e) {
+                document.getElementById("text-container").innerHTML = "Unfortunately your browser can't support Scribe.";
+                return false;
+            }
+        }
+        
+        function start(){
+            if (supports_html5_storage()) {                
+                //load up any text that's already stored
+                load();
+                
+                var editor = document.getElementById("text-container");
+                
+                //Remove "Start Writing..." from the editor on focus
+                editor.addEventListener("focus", function(e) {
+                    if (this.innerHTML=="Start Writing...") {
+                        this.innerHTML = "";
+                    }
+                });
+
+                //only paste plain text!
+                editor.addEventListener("paste", function(e) {
+                    // cancel paste
+                    e.preventDefault();
+                    // get text representation of clipboard
+                    var text = e.clipboardData.getData("text/plain");
+                    // insert text manually
+                    document.execCommand("insertHTML", false, text);
+                });
+
+                //When a user starts typing, move the focus to the editor.
+                var body = document.getElementsByTagName("body")[0];
+ 
+                body.addEventListener("keypress", function (event) {
+                    if (document.activeElement!=editor) {
+                        //code
+                        editor.focus();
+                    }
+                });  
+            }
+        }
+
+        //save the contents of the text container
+        function save(type){
+            
+            //get the text from the text container 
+            var storeText = document.getElementById("text-container").innerHTML;
+            //if the text is empty then reset it (adds "Start Writing..." back to the text container)
+            if (storeText=="") {
+                resetEditor();
+            }else{
+                //there is something to save so let's check if it's an auto save or if the user pressed a button
+                if (type=="button") {
+                    //this was a button press so always save
+                    notifySave();
+                    localStorage["save"] = storeText; 
+                }else{
+                    //this is an auto save
+                    if (localStorage["save"]) {
+                        //there is already something stored there let's see if it's changed
+                        if (localStorage["save"] != storeText) {
+                            notifySave();
+                            //console.log("updating");
+                            localStorage["save"] = storeText;
+                        }
+                    }else{
+                        //there is nothing saved so let's save!
+                        notifySave();
+                        localStorage["save"] = storeText;
+                    }
+                    
+                }
+            } 
+        }
+        
+        //notify the user that the content is being saved
+        function notifySave(){
+            var saveNotification = document.getElementById("save-notification");
+            //set the save notification element to "SAVING"
+            saveNotification.className = "saving";
+            saveNotification.innerHTML = "Saving";
+            
+            //get the current date & time of the save
+            var timeNow = new Date();
+            var day = timeNow.getDate();
+            var month = timeNow.getMonth() + 1;
+            var year = timeNow.getFullYear();
+            var hours = timeNow.getHours();
+            var minutes = timeNow.getMinutes();
+            var seconds = timeNow.getSeconds();
+            
+            var timeSaved = hours + ":" +minutes + " - " + day + "/" + month + "/" +year;
+            //store the saved time so that it can be loaded again on page load.
+            storeSaveTime(timeSaved);
+            //After 2 seconds change the save notification element to the time of last save
+            setTimeout(function(){
+                saveNotification.innerHTML = "Last saved: " +timeSaved;
+                saveNotification.className = "";
+            }, 2000);   
+        }
+        
+        //save the time in local storage
+        function storeSaveTime(saveTime){
+            localStorage["save_time"] = saveTime;
+        }
+        
+        
+        //Function for loading the text & time from local storage
+        function load(){
+            var load_text = localStorage["save"];
+            var time_last_saved = localStorage["save_time"];
+
+            if (load_text) {
+                document.getElementById("text-container").innerHTML = load_text;
+            }
+            
+            if (time_last_saved) {
+                document.getElementById("save-notification").innerHTML = "Last saved: " +time_last_saved;
+            }
+            
+        }
+        
+        /**
+         *  Function for clearing the localStorage -
+         *  Doesn't strictly clear the storage, rather it sets it back to the original text
+         *
+         *  TODO: Maybe just clear it?
+         *  
+         **/ 
+        function clearStorage() {
+            localStorage["save"] = "Start Writing...";
+            //reload the page
+            window.location.reload();
+        }
+        
+        /**
+         * Function to reset the editor back to "Start Writing...";
+         *
+         * Only resets the editor if the text container isn't the currently selected element,
+         * otherwise "Start Writing..." can be put back in as the user starts writing.
+         **/
+        function resetEditor(){
+            var editor = document.getElementById("text-container");
+            if (document.activeElement != editor) {
+                editor.innerHTML = "Start Writing...";
+            }
+        }
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-1745178-4']);
+        _gaq.push(['_trackPageview']);
+        
+        (function() {
+          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+</head>
+
+<body onload="start(); setInterval('save()', 5000)">
+    <div id="page">
+        <div id="text-container" contenteditable="true">Start Writing...</div>
+        <a href="javascript:" id="save" onclick="save('button')">Save</a>
+        <a href="javascript:" class="clear" onclick="clearStorage()">Clear</a>
+        <span id="save-notification"></span>
+    </div>
+</body>
+</html>
