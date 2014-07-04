@@ -1,0 +1,306 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <title>The Fantasmagorical Choosery Of Random Words</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2, user-scalable=1">
+    <script>
+        var hasStarted = false;
+        var hasFired = false;
+        var canStart = false;
+        var newNames = new Array();
+        
+        
+        
+        $(document).ready(function(){
+            $(".container.two").click(function(){
+                
+                if (hasStarted) {
+                    stop();  
+                }
+                  
+            });
+        });
+
+        
+        
+        $(document).ready(function(){
+            $(".add-new").click(function(){
+                //console.log("ran")
+                $(".names-input").append('<li><input type="text" placeholder="Enter choice"></li>');
+                //update the css for the options
+                var inputNum = $("input").length;
+                var heightVal = 100 / inputNum;
+                if (heightVal <= 7) {
+                    heightVal = 7;
+                }
+                $(".names-input li").css({'height' : heightVal +'%'});
+            });
+        });
+
+        
+        function start(){
+
+            
+            //setup the array of names
+            $("input").each(function(index, element){
+                if ($(this).val()) {
+                    newNames.push($(this).val());
+                    canStart = true;
+                }else{
+                    return;
+                }
+                
+            });
+            
+            
+            if (!hasStarted && canStart) {
+                setInterval('cycle()', 500);
+                hasStarted = true;
+                $(".left").hide();
+                $(".right").hide();
+                $(".container").css({'display' : 'table'});
+            } 
+        }
+        
+
+        
+        function cycle(){
+            if (!hasFired) {
+                //set the names up
+                //var names = new Array();
+                //names[0] = 'Izembard';
+                //names[1] = 'Arthur';
+                //names[2] = 'Fandango';
+                
+                var maxNames = newNames.length;
+                //console.log(maxNames);
+                var colours = new Array();
+                colours[0] = '#CCAD47';
+                colours[1] = '#2B595F';
+                colours[2] = '#BD3035';
+                colours[3] = '#73A153';
+                
+                //get a random number
+                var randomNum = getRandomInt(0, maxNames);
+                
+                var randomColourNum = getRandomInt(0, 3);
+                
+                var chosenName = newNames[randomNum];
+    
+                $(".name").text(chosenName);
+                $(".container").css({'background-color' : colours[randomColourNum]});
+            }
+
+            
+        }
+        
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        function stop(){
+            if (!hasFired) {
+                var current_name = $(".name").text();
+                $(".name").html("Winner! <br /> " +current_name);
+                $(".name").addClass("blink");
+            }
+
+            
+            hasFired = true;
+        }
+   
+    </script>
+    <style>
+        a{
+            color: #000;
+        }
+        .button{
+            display: inline-block;
+            background: #03E090;
+            text-decoration: none;
+            color: #FFF;
+            height: 50vh;
+        }
+        .button:hover{
+            background: #02D090
+        }
+        .inner{
+            vertical-align: middle;
+            display: table-cell;
+        }
+        .name{
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 150px;
+            color: #FFF;
+            font-weight: bold;
+        }
+        .container{
+            display: none;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .left{
+            position: fixed;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            float: left;
+            width: 50%;
+            background: #f4f4f4;
+            height: 100vh;
+        }
+        ul{
+            padding: 0;
+            margin: 0px;
+            height: 100vh;
+        }
+        li{
+            list-style: none;
+            text-align: center;
+            display: block;
+            height: 25%;
+        }
+        input{
+            font-size: 50px;
+            width: 100%;
+            height: 100%;
+            border-bottom: 1px solid #000;
+            padding: 0px 0px 0px 20px;
+            border: 0;
+            font-family: 'Montserrat';
+        }
+        .right{
+            display: table;
+            float: right;
+            width: 50%;
+            text-align: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .right a{
+            width: 100%;
+            display: table;
+        }
+        .right span{
+            display: table-cell;
+            vertical-align: middle;
+        }
+        
+        body{
+            overflow: hidden;
+            font-family: 'Montserrat';
+
+            font-size: 40px;
+            padding: 0;
+            margin: 0;
+        }
+        .blink {
+            -webkit-animation: blink .75s linear infinite;
+            -moz-animation: blink .75s linear infinite;
+            -ms-animation: blink .75s linear infinite;
+            -o-animation: blink .75s linear infinite;
+            animation: blink .75s linear infinite;
+        }
+        
+        @-webkit-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        
+        @-moz-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        
+        @-ms-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        
+        @-o-keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 1; }
+            50.01% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+        
+        @media screen and (max-width: 600px) {
+            body .right{
+                position: fixed;
+                top: 0;
+                font-size: 20px;
+                width: 100%;
+                height: 55px;
+                display: block;
+                z-index: -1;
+            }
+            body .right a{
+                display: block;
+                width: 50%;
+                padding: 20px 0px;
+                height: auto;
+                min-height: 55px;
+                float: left;
+            }
+            body .right span{
+                display: block;
+            }
+            body .left{
+                width: 100%;
+                position: static;
+                margin-top: 95px;
+                font-size: 30px;
+            }
+            body .left li{
+                /*height: auto;*/
+            }
+            body .left input{
+                /*height: auto;*/
+                padding: 20px 0px;
+                font-size: 20px;
+            }
+            body .container{
+                font-size: 50px;
+            }
+        }
+        
+    </style>
+</head>
+<body onload="">
+        <div class="left">
+            <ul class="names-input">
+                <li><input type="text" placeholder="Enter choice"></li>
+                <li><input type="text" placeholder="Enter choice"></li>
+                <li><input type="text" placeholder="Enter choice"></li>
+                <li><input type="text" placeholder="Enter choice"></li>
+            </ul>
+        </div>
+        <div class="right">
+            <a href="javascript:" class="button add-new"><span>Add another option</span></a>
+            <a href="javascript:" onclick="start()" class="button"><span>Start <br /> (click to stop)</span></a>  
+        </div>
+    </div>
+    <div class="container two">
+        <div class="name"></div> 
+    </div>
+    
+</body>
+</html>
