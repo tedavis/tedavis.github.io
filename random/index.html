@@ -190,6 +190,14 @@
             display: table-cell;
             vertical-align: middle;
         }
+        .instructions{
+            text-align: center;
+            position: fixed;
+            top: 10px;
+            width: 100%;
+            font-size: 20px;
+            color: rgba(255,255,255,0.5);
+        }
         
         body{
             overflow: hidden;
@@ -295,10 +303,11 @@
         </div>
         <div class="right">
             <a href="javascript:" class="button add-new"><span>Add another option</span></a>
-            <a href="javascript:" onclick="start()" class="button"><span>Start <br /> (click to stop)</span></a>  
+            <a href="javascript:" onclick="start()" class="button"><span>Start</span></a>  
         </div>
     </div>
     <div class="container two">
+        <div class="instructions">Click to stop</div>
         <div class="name"></div> 
     </div>
     
